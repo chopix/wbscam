@@ -1,2 +1,4 @@
 tg/node_modules
 frontend/node_modules
+tg/.env
+frontend/.env

@@ -32,7 +32,7 @@
     <div class="bg-white w-full h-[150px] flex flex-col justify-center rounded-[20px] px-[20px] mt-3 relative">
       <p class="text-[#242424] font-bold text-[18px]">Личные данные</p>
       <input v-model="fio" class="mt-4" placeholder="ФИО" type="text">
-      <input v-model="number" class="mt-6" placeholder="Номер телефона" type="text">
+      <input v-model="phone" class="mt-6" placeholder="Номер телефона" type="text">
     </div>
     <div class="bg-white w-full h-[160px] flex flex-col justify-around rounded-[20px] px-[20px] mt-3 relative">
       <div>
