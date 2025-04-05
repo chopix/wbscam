@@ -12,7 +12,7 @@
               clip-rule="evenodd" />
           </svg>
           <p class="text-[#f44] text-lg font-semibold ml-1">{{ info.price }} ₽</p>
-          <p class="text-sm font-semibold ml-2">{{ info.price * 1.2 }} ₽</p>
+          <p class="text-sm font-semibold ml-2">{{ Math.floor(info.price * 1.2) }} ₽</p>
         </div>
         <p class="text-[12px] text-[red] font-medium">с WB Кошельком</p>
       </div>
@@ -118,7 +118,7 @@
                 clip-rule="evenodd" />
             </svg>
             <p class="text-[#f44] text-lg font-semibold ml-1">{{ info.price }} ₽</p>
-            <p class="text-sm font-semibold ml-2 text-[#868695] line-through">{{ info.price * 1.2 }} ₽</p>
+            <p class="text-sm font-semibold ml-2 text-[#868695] line-through">{{ Math.floor(info.price * 1.2) }} ₽</p>
           </div>
           <p class="text-[12px] text-[red] font-medium">с WB Кошельком</p>
           <p class="text-[#868695] font-medium whitespace-nowrap overflow-hidden text-ellipsis mt-1">Щетка для уборки с
@@ -586,7 +586,7 @@
       <div class="flex justify-between items-center">
         <div class="flex items-center">
           <p class="text-[#f44] text-lg font-semibold ml-1">{{ info.price }} ₽</p>
-          <p class="text-sm font-semibold ml-2">{{ info.price * 1.2 }} ₽</p>
+          <p class="text-sm font-semibold ml-2">{{ Math.floor(info.price * 1.2) }} ₽</p>
         </div>
         <div class="flex items-center gap-x-1">
           <p class="font-semibold text-[12px]">{{ new Date(Date.now() + 2 * 24 * 60 * 60 *

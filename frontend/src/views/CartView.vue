@@ -11,7 +11,7 @@
         <div class="ml-4">
           <div class="flex items-center">
             <p class="text-[#f44] text-lg font-semibold">{{ info.price }} ₽</p>
-            <p class="text-sm font-semibold ml-2">{{ info.price * 1.2 }} ₽</p>
+            <p class="text-sm font-semibold ml-2">{{ Math.floor(info.price * 1.2) }} ₽</p>
           </div>
           <p class="text-[12px] text-[red] font-medium">с WB Кошельком</p>
           <p class="text-[14px] mt-2 max-w-full">{{ info.title }}</p>
