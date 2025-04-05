@@ -43,7 +43,7 @@ Ad.init(
       allowNull: false,
     },
     tgId: {
-      type: DataTypes.INTEGER,
+      type: DataTypes.BIGINT(100),
       allowNull: false,
     },
   },
