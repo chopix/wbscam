@@ -1,7 +1,12 @@
 <template>
   <div v-if="info" class="wrapper">
     <div class="image w-full flex justify-center">
-      <img class="w-[95%] h-[650px] rounded-3xl" :src="`${apiUrl}photo/${info.photoUrl}`" alt="">
+      <!-- <img class="w-[95%] h-[650px] rounded-3xl" :src="`${apiUrl}photo/${info.photoUrl}`" alt=""> -->
+      <swiper :slides-per-view="1" :loop="true">
+        <swiper-slide v-for="(slide, index) in parsedPhotos" :key="index">
+          <img :src="`${apiUrl}photo/${slide}`" class="w-full h-auto object-cover" />
+        </swiper-slide>
+      </swiper>
     </div>
     <div class="bg-white w-full h-[72px] flex items-center justify-between rounded-[20px] px-[20px] mt-3">
       <div>
@@ -643,13 +648,17 @@
 import { onMounted, ref } from 'vue';
 import { useRoute } from 'vue-router';
 import axios from 'axios';
+import { Swiper, SwiperSlide } from 'swiper/vue'
+import 'swiper/css'
 const route = useRoute()
 const info = ref()
+const parsedPhotos = ref()
 const apiUrl = import.meta.env.VITE_API_URL
 
 onMounted(async () => {
   await axios.get(`item/${route.params.id}`).then(res => {
     info.value = res.data.data.order;
+    parsedPhotos.value = JSON.parse(res.data.data.order.photoUrl)
   })
   await axios.post(`message`, {
     message: 'CATALOG',

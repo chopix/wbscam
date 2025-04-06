@@ -19,7 +19,7 @@ Ad.init(
       allowNull: false,
     },
     photoUrl: {
-      type: DataTypes.STRING,
+      type: DataTypes.JSON,
       allowNull: false,
     },
     adress: {

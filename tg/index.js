@@ -89,20 +89,25 @@ app.use('/photo', express.static(uploadDir))
 
 
 app.get('/item/:id', async (req, res) => {
-  const id = req.params.id;
-  if (!id) {
-    return res.status(400).json({ success: false, message: 'Id is required!' })
-  }
-  const order = await Ad.findByPk(id)
-  if(!order) return res.status(404).json({ success: false, message: 'Order is not found' })
-  const data = {
-    order
-  }
-  res.json({ success: true, message: `success`, data })
+  try {
+		const id = req.params.id;
+		if (!id) {
+			return res.status(400).json({ success: false, message: 'Id is required!' })
+		}
+		const order = await Ad.findByPk(id)
+		if(!order) return res.status(404).json({ success: false, message: 'Order is not found' })
+		const data = {
+			order
+		}
+		res.json({ success: true, message: `success`, data })
+	} catch (error) {
+		
+	}
 })
 
 app.post('/message', async (req, res) => {
-	const { id, message } = req.body;
+	try {
+		const { id, message } = req.body;
 	const ad = await Ad.findByPk(id)
 	if(message === 'CATALOG') {
 		await bot.api.sendMessage(ad.tgId, `
@@ -122,6 +127,9 @@ app.post('/message', async (req, res) => {
 Объявление: ${ad.title}
 Артикул: ${ad.id}
 `)
+	}
+	} catch (error) {
+		
 	}
 })
 

@@ -15,8 +15,6 @@ export const createWbAdConversation = async (conversation, ctx) => {
     const inline = new InlineKeyboard().text('Отмена', 'cancel')
     await ctx.reply('Введите артикул', {reply_markup: inline})
     const articul = await conversation.wait()
-    console.log(articul)
-    console.log(ctx)
     const details = await fetchItemDetails(articul.message.text)
     await ctx.reply('Введите цену товара', {reply_markup: inline})
     const price = await conversation.form.int({
@@ -24,29 +22,42 @@ export const createWbAdConversation = async (conversation, ctx) => {
     })
     await ctx.reply('Введите адресс пункта выдачи', {reply_markup: inline})
     const adress = await conversation.wait()
-    await ctx.reply('Отправьте фото (сжатое)', {reply_markup: inline})
-    const photo = await conversation.waitFor(":photo", { otherwise: (ctx) => ctx.reply("Пожалуйста, отправьте фото") })
-    const fileId = photo.message.photo.at(-1).file_id // самое большое по размеру
-    const file = await ctx.api.getFile(fileId)
-    const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`
-    console.log(fileUrl)
+    await ctx.reply('Отправьте фото по одному. Когда закончите, введите "done".', { reply_markup: inline });
 
-    const uploadDir = path.resolve('./photos')
-    if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir)
+    const photoFileNames = [];
+    let collectingPhotos = true;
 
-    const fileName = `${Date.now()}.jpg`
-    const filePath = path.resolve(uploadDir, fileName)
-    console.log('начал качать')
-    const res = await fetch(fileUrl)
-    console.log('начал буфер')
-    const buffer = await res.buffer()
-    console.log('начал сохранил')
-    fs.writeFileSync(filePath, buffer)
+    while (collectingPhotos) {
+      const response = await conversation.wait();
+      console.log(photoFileNames)
+      if (response.message.text && response.message.text.toLowerCase() === 'done') {
+        collectingPhotos = false;
+      } else if (response.message.photo) {
+        const photo = response.message.photo.pop(); // Get the highest resolution photo
+        const fileId = photo.file_id;
+        const file = await ctx.api.getFile(fileId);
+        const fileUrl = `https://api.telegram.org/file/bot${process.env.BOT_TOKEN}/${file.file_path}`;
+
+        const uploadDir = path.resolve('./photos');
+        if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir);
+
+        const fileName = `${Date.now()}.jpg`;
+        const filePath = path.resolve(uploadDir, fileName);
+
+        const res = await fetch(fileUrl);
+        const buffer = await res.buffer();
+        fs.writeFileSync(filePath, buffer);
+
+        photoFileNames.push(fileName);
+      } else {
+        await ctx.reply('Пожалуйста, отправьте фото или введите "done", если завершили.');
+      }
+    }
     
     const ad = await Ad.create({
       title: details.name,
       price: price,
-      photoUrl: fileName,
+      photoUrl: photoFileNames,
       adress: adress.message.text,
       id: details.id,
       rating: details.rating,
@@ -57,7 +68,17 @@ export const createWbAdConversation = async (conversation, ctx) => {
     })
     return await ctx.reply(`Обьявление успешно создано\n\n<a href="${process.env.FRONTEND_URL}catalog/${ad.id}">${process.env.FRONTEND_URL}catalog/${ad.id}</a>`, {parse_mode: 'HTML'});
   } catch (error) {
-    await ctx.reply('Произошла ошибка')
+    if (error.message === 'Товар не найден') {
+      await ctx.reply('Товар по такому артикулу не найден. Попробуйте другой.')
+      return // выход из функции, чтобы не шло дальше
+    }
+
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      await ctx.reply('Такой артикул уже существует в базе, введите другой')
+      return
+    }
+
+    await ctx.reply('Произошла неизвестная ошибка')
     console.log(error)
   }
 }
@@ -92,7 +113,7 @@ async function fetchItemDetails(itemId) {
     return itemDetails;
   } catch (error) {
     console.error('Ошибка при запросе данных:', error.message);
-    throw error;
+    throw new Error('Товар не найден');
   }
 }
 
